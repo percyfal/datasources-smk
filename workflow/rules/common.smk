@@ -56,10 +56,11 @@ def get_uri_netloc(uri):
 
 def parse_uri(uri):
     """Parse uri and return snakemake target"""
+    allowed_schemes = ['', 'rsync', 'file', 'sftp', 'http', 'https']
     scheme = get_uri_scheme(uri)
     uri = re.sub(f"{scheme}://", "", uri)
-    if not scheme in ['', 'rsync', 'file', 'sftp']:
-        logger.error(f"scheme '{scheme}' not allowed: use one of '', 'file', 'rsync' or 'sftp'")
+    if not scheme in allowed_schemes:
+        logger.error(f"scheme '{scheme}' not allowed: use one of {','.join(allowed_schemes[1:])}")
         sys.exit(1)
     if scheme in ['', 'file'] and not uri.startswith("/"):
         uri = os.path.normpath(os.path.abspath(uri))
@@ -68,6 +69,13 @@ def parse_uri(uri):
             from snakemake.remote.SFTP import RemoteProvider
             SFTP = RemoteProvider()
             uri = SFTP.remote(uri)
+        except WorkflowError as e:
+            logger.error(e)
+    if scheme == 'http' or scheme == 'https':
+        try:
+            from snakemake.remote.HTTP import RemoteProvider
+            HTTP = RemoteProvider()
+            uri = HTTP.remote(uri)
         except WorkflowError as e:
             logger.error(e)
     return uri

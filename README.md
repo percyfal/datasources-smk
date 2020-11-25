@@ -1,10 +1,13 @@
-# Snakemake workflow: Datasources
+# Snakemake workflow: datasources-smk
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.bitbucket.io)
-[![Build Status](https://travis-ci.org/snakemake-workflows/datasources-smk.svg?branch=master)](https://travis-ci.org/snakemake-workflows/datasources-smk)
+[![Build status](https://github.com/percyfal/datasources-smk/workflows/Tests/badge.svg?branch=main)](https://github.com/percyfal/datasources-smk/actions?query=workflow%3ATests) ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-This is the template for a new Snakemake workflow. Replace this text with a comprehensive description covering the purpose and domain.
-Insert your code into the respective folders, i.e. `scripts`, `rules`, and `envs`. Define the entry point of the workflow in the `Snakefile` and the main configuration in the `config.yaml` file.
+This workflow reads a tab-separated datasources file with columns
+`data` and `source` consisting of file uris and generates data uris
+based on sources. Supported URI schemes are currently `rsync`, `file`,
+`http` and `https`.
+
 
 ## Authors
 

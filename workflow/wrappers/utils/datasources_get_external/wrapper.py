@@ -17,10 +17,15 @@ if source is None or len(source) == 0:
     source = snakemake.params.uri
 dest = snakemake.output.resource_file
 scheme = snakemake.params.scheme
-cmd_map = {"": "ln -s", "rsync": "rsync -av", "sftp": "cp", "file": "ln -s"}
+
+cmd_map = {"": "ln -s", "rsync": "rsync -av", "sftp": "cp", "file":
+           "ln -s", "http": "wget", "https": "wget"}
 cmd = cmd_map[scheme]
 
 outdir = os.path.dirname(dest)
 shell("mkdir -p {outdir}")
 logger.debug(f"Using command {cmd} {source} {dest} {log}")
-shell("{cmd} {source} {dest} {log}")
+if cmd == "wget":
+    shell("{cmd} {source} -O {dest} {log}")
+else:
+    shell("{cmd} {source} {dest} {log}")
