@@ -1,4 +1,4 @@
 data	source
-data/foo1.txt	rsync://./external_resources/foo1.txt
-data/foo2.txt	file://./external_resources/foo2.txt
+data/foo1.txt	rsync://external_resources/foo1.txt
+data/foo2.txt	file://external_resources/foo2.txt
 data/README.md	https://https://raw.githubusercontent.com/percyfal/datasources-smk/main/README.md

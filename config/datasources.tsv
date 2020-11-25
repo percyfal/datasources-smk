@@ -1,2 +1,2 @@
 data	source
-data/external/metadata.txt	rsync://./external_resources/metadata.txt
+data/external/metadata.txt	rsync://external_resources/metadata.txt
