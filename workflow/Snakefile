@@ -1,0 +1,6 @@
+include: "rules/common.smk"
+include: "rules/utils.smk"
+
+
+rule all:
+    input: all_input
