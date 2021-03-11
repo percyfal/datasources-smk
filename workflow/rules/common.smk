@@ -10,7 +10,7 @@ SMK_WRAPPER_PREFIX_RAW = "https://github.com/snakemake/snakemake-wrappers/raw"
 WRAPPER_PREFIX = workflow.wrapper_prefix
 if WRAPPER_PREFIX == SMK_WRAPPER_PREFIX_RAW:
     # Change main to version number once we start sem-versioning
-    WRAPPER_PREFIX = "https://raw.githubusercontent.com/percifal/datasources-smk/main/workflow/wrappers"
+    WRAPPER_PREFIX = "https://raw.githubusercontent.com/percyfal/datasources-smk/main/workflow/wrappers"
 
 
 # this container defines the underlying OS for each job when using the workflow
