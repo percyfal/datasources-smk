@@ -33,10 +33,6 @@ def _read(infile, index, schema, idcols=None):
         df = pd.DataFrame(data)
     elif os.path.splitext(infile)[1] == ".tsv":
         df = pd.read_csv(infile, sep="\t")
-    if "id" not in df.columns and index == ["id"]:
-        logger.info(f"generating id column from {idcols}")
-        df["id"] = "_".join(df[idcols])
-        df["id"] = df[idcols].agg('_'.join, axis=1)
     df.set_index(index, drop=False, inplace=True)
     df = df.replace({np.nan: None})
     df.index.names = index
