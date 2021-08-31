@@ -13,9 +13,14 @@ from urllib import parse
 
 
 # Constructor-like wrapper
-def urlparse(url):
+def urlparse(url, scheme=None):
     if url is None:
         return None
+    if not scheme is None:
+        if isinstance(url, str):
+            url = f"{scheme}:{url}"
+        elif isinstance(url, list):
+            url = [f"{scheme}:{u}" for u in url]
     if isinstance(url, list):
         return [Url(**parse.urlparse(u)._asdict()) for u in url]
     return Url(**parse.urlparse(url)._asdict())
@@ -29,17 +34,26 @@ class Url(parse.ParseResult):
         super().__init__()
 
 
+    def _uri(self, scheme=False):
+        if scheme:
+            scheme = self.scheme
+        else:
+            scheme = ''
+        uri = parse.urlunsplit((scheme, self.netloc, self.path, '', ''))
+        uri = re.sub("^//", "", uri)
+        return uri
+
+
     @property
     def uri(self):
         """Format url as uri without scheme"""
-        ip = None
-        if self.hostname is not None:
-            ip = self.hostname
-        if self.port is not None:
-            ip = ip + ":" + str(self.port)
-        uri = parse.urlunsplit(('', ip, self.path, '', ''))
-        uri = re.sub("^//", "", uri)
-        return uri
+        return self._uri()
+
+
+    @property
+    def full_uri(self):
+        """Format url as uri with scheme"""
+        return self._uri(scheme=True)
 
 
     @property
@@ -47,6 +61,8 @@ class Url(parse.ParseResult):
         """Create snakemake target representation of data source"""
         uri = self.uri
         if self.scheme == 'sftp':
+            # FIXME: this setup currently fails; in contrast to fabric
+            # it seems paramiko doesn't make use of the ssh-agent
             try:
                 from snakemake.remote.SFTP import RemoteProvider
                 SFTP = RemoteProvider()
@@ -72,7 +88,7 @@ class Url(parse.ParseResult):
 
     def glob(self):
         if self.netloc == '':
-            return urlparse(glob.glob(self.uri))
+            return urlparse(glob.glob(self.uri), scheme=self.scheme)
         try:
             import fabric
             import fnmatch
@@ -151,8 +167,6 @@ class UrlMap:
 
 
     def get_source(self, wildcards):
-        src = self.get_source_url(wildcards).source
-        print(src)
         return self.get_source_url(wildcards).source
 
 
