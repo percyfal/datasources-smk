@@ -15,17 +15,22 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 source = snakemake.input.get("uri", None)
 if source is None or len(source) == 0:
     source = snakemake.params.uri
-dest = snakemake.output.resource_file
+target = snakemake.output.target
 scheme = snakemake.params.scheme
 
 cmd_map = {"": "ln -s", "rsync": "rsync -av", "sftp": "cp", "file":
            "ln -s", "http": "wget", "https": "wget"}
 cmd = cmd_map[scheme]
 
-outdir = os.path.dirname(dest)
+outdir = os.path.dirname(target)
 shell("mkdir -p {outdir}")
-logger.debug(f"Using command {cmd} {source} {dest} {log}")
+
+if cmd == "ln -s":
+    source = os.path.abspath(source)
+
+logger.debug(f"Using command {cmd} {source} {target} {log}")
+
 if cmd == "wget":
-    shell("{cmd} {source} -O {dest} {log}")
+    shell("{cmd} {source} -O {target} {log}")
 else:
-    shell("{cmd} {source} {dest} {log}")
+    shell("{cmd} {source} {target} {log}")

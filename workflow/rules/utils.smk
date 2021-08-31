@@ -1,14 +1,14 @@
 rule datasources_get_external:
     """Get external resources with appropriate method"""
     wildcard_constraints:
-        resource_file = wildcards_or(src_map.keys())
+        target = wildcards_or(url_map.target)
     output:
-        resource_file = "{resource_file}"
-    input: uri = datasources_get_external_input
+        target = "{target}"
+    input: uri = url_map.get_source
     params:
-        uri = lambda wildcards: parse_uri(src_map[wildcards.resource_file])[1],
-        scheme = lambda wildcards: get_uri_scheme(src_map[wildcards.resource_file])
-    log: "logs/datasources_get_external/{resource_file}.log"
+        uri = url_map.get_source_uri,
+        scheme = url_map.get_source_scheme
+    log: "logs/datasources_get_external/{target}.log"
     wrapper:
         f"{WRAPPER_PREFIX}/utils/datasources_get_external"
 

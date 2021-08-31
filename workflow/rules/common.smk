@@ -1,9 +1,12 @@
 import os
+import re
 import yaml
 import urllib
 import numpy as np
+import glob
 from snakemake.utils import validate
 import pandas as pd
+from url import UrlMap
 
 # Determine wrapper prefix since we mix local wrappers with wrappers
 # from snakemake-wrappers
@@ -43,52 +46,17 @@ datasources = _read(config["datasources"], ["data"],
                     "../schemas/datasources.schema.yaml")
 
 ##################################################
-## Uri parsing functions
+## Formatting functions and other utilities
 ##################################################
-def get_uri_scheme(uri):
-    return urllib.parse.urlparse(uri).scheme
-
-def get_uri_netloc(uri):
-    return urllib.parse.urlparse(uri).netloc
-
-def parse_uri(uri):
-    """Parse uri and return snakemake target"""
-    allowed_schemes = ['', 'rsync', 'file', 'sftp', 'http', 'https']
-    scheme = get_uri_scheme(uri)
-    uri = re.sub(f"{scheme}://", "", uri)
-    if not scheme in allowed_schemes:
-        logger.error(f"scheme '{scheme}' not allowed: use one of {','.join(allowed_schemes[1:])}")
-        sys.exit(1)
-    if scheme in ['', 'file'] and not uri.startswith("/"):
-        uri = os.path.normpath(os.path.abspath(uri))
-    if scheme == 'sftp':
-        try:
-            from snakemake.remote.SFTP import RemoteProvider
-            SFTP = RemoteProvider()
-            uri = SFTP.remote(uri)
-        except WorkflowError as e:
-            logger.error(e)
-    if scheme == 'http' or scheme == 'https':
-        try:
-            from snakemake.remote.HTTP import RemoteProvider
-            HTTP = RemoteProvider()
-            uri = HTTP.remote(uri)
-        except WorkflowError as e:
-            logger.error(e)
-    return uri
-
-def datasources_get_external_input(uri):
-    if get_uri_scheme(uri) == "sftp":
-        return parse_uri(uri)
-    netloc = get_uri_netloc(uri)
-    uri = parse_uri(uri)
-    if re.search("[:@]", netloc):
-        return []
-    return uri
+def wildcards_or(items):
+    items = [str(x) for x in set(items)]
+    return f'({"|".join(items)})'
 
 ##################################################
 # Input collection functions
 ##################################################
+url_map = UrlMap(datasources.source.to_list(), datasources.data.to_list())
+
+
 def all_input(wildcards):
-    d = datasources["data"].to_list()
-    return d
+    return url_map.uri_keys
