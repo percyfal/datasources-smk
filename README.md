@@ -3,10 +3,25 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.bitbucket.io)
 [![Build status](https://github.com/percyfal/datasources-smk/workflows/Tests/badge.svg?branch=main)](https://github.com/percyfal/datasources-smk/actions?query=workflow%3ATests) ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-This workflow reads a tab-separated datasources file with columns
-`data` and `source` consisting of file uris and generates data uris
-based on sources. Supported URI schemes are currently `rsync`, `file`,
+This workflow reads a datasources yaml file with list elements
+consisting of `data` and `source` keys, or alternatively a
+tab-separated file with columns `data` and `source`. The `data` and
+`source` keys define file URI mapping from source to a snakemake
+target. Supported URI schemes are currently `rsync`, `file`, `sftp`,
 `http` and `https`.
+
+By default, the workflow will look for a configuration entry key
+`datasources` in the configuration file `config/config.yaml` that
+points to the datasources file. If no such entry exists, the workflow
+will look for files `config/datasources.yaml` and
+`config/datasources.tsv`, in that order.
+
+URIs are given according to the [URI generic
+syntax](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax).
+For instance, a local file is given as `file:relative/path/to/source`,
+whereas examples of a remote files are
+`rsync://example.com:80/absolute/path/to/source` and
+`sftp://example.com:80/absolute/path/to/source`.
 
 
 ## Authors

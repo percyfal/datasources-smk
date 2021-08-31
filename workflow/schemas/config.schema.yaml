@@ -7,6 +7,3 @@ type: object
 properties:
   datasources:
     type: string
-
-required:
-  - datasources

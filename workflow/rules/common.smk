@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import yaml
 import urllib
 import numpy as np
@@ -42,8 +43,16 @@ def _read(infile, index, schema, idcols=None):
     validate(df, schema=schema)
     return df
 
-datasources = _read(config["datasources"], ["data"],
-                    "../schemas/datasources.schema.yaml")
+datasources = None
+for infile in config.get("datasources", None), "config/datasources.yaml", "config/datasources.tsv":
+    if infile is not None and os.path.exists(infile):
+        datasources = _read(infile, ["data"],
+                            "../schemas/datasources.schema.yaml")
+    if datasources is not None:
+        break
+if datasources is None:
+    print("No datasources found: exiting")
+    sys.exit(1)
 
 ##################################################
 ## Formatting functions and other utilities
