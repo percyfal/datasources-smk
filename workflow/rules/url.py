@@ -141,7 +141,6 @@ class UrlMap:
                 self._target.append(urlparse(tgt))
                 self._source.append(urlparse(src))
 
-
     @property
     def source(self):
         return self._source

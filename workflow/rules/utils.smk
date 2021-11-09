@@ -8,9 +8,8 @@ rule datasources_get_external:
     params:
         uri = url_map.get_source_uri,
         scheme = url_map.get_source_scheme
+    conda: "../envs/datasources.yaml"
     log: "logs/datasources_get_external/{target}.log"
-    wrapper:
-        f"{WRAPPER_PREFIX}/utils/datasources_get_external"
-
+    script: "../scripts/datasources_get_external.py"
 
 localrules: datasources_get_external

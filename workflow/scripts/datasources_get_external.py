@@ -22,15 +22,24 @@ cmd_map = {"": "ln -s", "rsync": "rsync -av", "sftp": "cp", "file":
            "ln -s", "http": "wget", "https": "wget"}
 cmd = cmd_map[scheme]
 
-outdir = os.path.dirname(target)
-shell("mkdir -p {outdir}")
+if not isinstance(source, list):
+    source = [source]
+if not isinstance(target, list):
+    target = [target]
+if len(source) != len(target):
+    print("source and target must be of equal lengths")
+    raise Exception
 
-if cmd == "ln -s":
-    source = os.path.abspath(source)
+for src, tgt in zip(source, target):
+    outdir = os.path.dirname(tgt)
+    shell("mkdir -p {outdir}")
 
-logger.debug(f"Using command {cmd} {source} {target} {log}")
+    if cmd == "ln -s":
+        src = os.path.abspath(src)
 
-if cmd == "wget":
-    shell("{cmd} {source} -O {target} {log}")
-else:
-    shell("{cmd} {source} {target} {log}")
+    logger.debug(f"Using command {cmd} {src} {tgt} {log}")
+
+    if cmd == "wget":
+        shell("{cmd} {src} -O {tgt} {log}")
+    else:
+        shell("{cmd} {src} {tgt} {log}")
