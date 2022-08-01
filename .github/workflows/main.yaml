@@ -1,11 +1,6 @@
 name: Tests
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches_ignore: []
+on: [push, pull_request]
 
 jobs:
   Linting:
