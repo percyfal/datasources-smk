@@ -74,6 +74,6 @@ deps =
     pytest-cov
     pip>=7.0.0
     wheel
-#commands =
-#    pytest --basetemp="{envtmpdir}" {posargs}
+commands =
+    pytest --basetemp="{envtmpdir}" {posargs}
 """
