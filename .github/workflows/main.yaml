@@ -13,20 +13,20 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Lint workflow
-      uses: snakemake/snakemake-github-action@v1.12.0
+      uses: snakemake/snakemake-github-action@v1
       with:
-        directory: .
-        snakefile: workflow/Snakefile
+        directory: src/datasources
+        snakefile: src/datasources/workflow/Snakefile
         args: "--lint"
 
   Testing:
     runs-on: ubuntu-latest
     needs: Linting
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Test workflow (local test data)
-      uses: snakemake/snakemake-github-action@v1.12.0
+      uses: snakemake/snakemake-github-action@v1
       with:
         directory: .test
-        snakefile: workflow/Snakefile
-        args: "--use-conda --show-failed-logs -j 2 --conda-cleanup-pkgs cache --conda-frontend mamba --wrapper-prefix file:///github/workspace/workflow/wrappers"
+        snakefile: src/datasources/workflow/Snakefile
+        args: "--use-conda --show-failed-logs -j 2 --conda-cleanup-pkgs cache --conda-frontend mamba"
