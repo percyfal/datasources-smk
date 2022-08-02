@@ -22,10 +22,8 @@ classifiers = [
 ]
 dependencies = [
     'importlib-metadata; python_version>="3.7"',
-    'snakemake',
     'jsonschema',
     'pypandoc',
-    'ruamel.yaml'
 ]
 dynamic = ["version"]
 
@@ -73,6 +71,7 @@ deps =
     pytest
     pytest-cov
     pip>=7.0.0
+    snakemake
     wheel
 commands =
     pytest --basetemp="{envtmpdir}" {posargs}
