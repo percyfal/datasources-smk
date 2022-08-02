@@ -7,15 +7,9 @@ import numpy as np
 import glob
 from snakemake.utils import validate
 import pandas as pd
-from url import UrlMap
 
-# Determine wrapper prefix since we mix local wrappers with wrappers
-# from snakemake-wrappers
-SMK_WRAPPER_PREFIX_RAW = "https://github.com/snakemake/snakemake-wrappers/raw"
-WRAPPER_PREFIX = workflow.wrapper_prefix
-if WRAPPER_PREFIX == SMK_WRAPPER_PREFIX_RAW:
-    # Change main to version number once we start sem-versioning
-    WRAPPER_PREFIX = "https://raw.githubusercontent.com/percyfal/datasources-smk/main/workflow/wrappers"
+from datasources.url import UrlMap
+from datasources.utils import wildcards_or
 
 
 # this container defines the underlying OS for each job when using the workflow
@@ -25,9 +19,7 @@ container: "docker://continuumio/miniconda3"
 
 ##### load config and sample sheets #####
 
-
 configfile: "config/config.yaml"
-
 
 validate(config, schema="../schemas/config.schema.yaml")
 
@@ -62,13 +54,6 @@ for infile in (
 if datasources is None:
     print("No datasources found: exiting")
     sys.exit(1)
-
-##################################################
-## Formatting functions and other utilities
-##################################################
-def wildcards_or(items):
-    items = [str(x) for x in set(items)]
-    return f'({"|".join(items)})'
 
 
 ##################################################
