@@ -17,6 +17,12 @@ properties:
       - file://data/raw/reads_1.fastq.gz
       - rsync:///datastore/reads_1.fastq.gz
       - sftp://user@datastore.com:/datastore/reads_1.fastq.gz
+  description:
+    type: string
+    description: Description of data source
+  tag:
+    type: string
+    description: Tag label to group targets
 
 required:
   - data
