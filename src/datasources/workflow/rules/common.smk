@@ -8,21 +8,23 @@ import glob
 from snakemake.utils import validate
 import pandas as pd
 
-from datasources.url import UrlMap
-from datasources.utils import wildcards_or
-
+try:
+    from datasources.url import UrlMap
+    from datasources.utils import wildcards_or
+except ModuleNotFoundError:
+    print("datasources module not installed")
+    print("Either: ")
+    print("  1. point PYTHONPATH to workflow source directory or")
+    print("  2. run 'pip install -e /path/to/datasources' or")
+    print("  3. run 'pip install datasources")
+    raise
 
 # this container defines the underlying OS for each job when using the workflow
 # with --use-conda --use-singularity
 container: "docker://continuumio/miniconda3"
 
 
-##### load config and sample sheets #####
-
-configfile: "config/config.yaml"
-
-validate(config, schema="../schemas/config.schema.yaml")
-
+# ##### load datasources #####
 
 def _read(infile, index, schema, idcols=None):
     if infile is None:
@@ -41,12 +43,19 @@ def _read(infile, index, schema, idcols=None):
     return df
 
 
+if config.get("datasources") is None:
+    configfiles = [
+        "datasources.yaml",
+        "datasources.tsv",
+        "config/datasources.yaml",
+        "config/datasources.tsv",
+    ]
+else:
+    configfiles = [config.get("datasources")]
+
 datasources = None
-for infile in (
-    config.get("datasources", None),
-    "config/datasources.yaml",
-    "config/datasources.tsv",
-):
+
+for infile in configfiles:
     if infile is not None and os.path.exists(infile):
         datasources = _read(infile, ["data"], "../schemas/datasources.schema.yaml")
     if datasources is not None:

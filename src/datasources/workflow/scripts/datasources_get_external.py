@@ -34,6 +34,9 @@ if len(source) != len(target):
     print("source and target must be of equal lengths")
     raise Exception
 
+
+# FIXME: Move to datasources function. Add pattern/tag argument for
+# restricting outputs
 for src, tgt in zip(source, target):
     outdir = os.path.dirname(tgt)
     shell("mkdir -p {outdir}")

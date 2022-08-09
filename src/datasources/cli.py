@@ -1,4 +1,5 @@
 """Console script for datasources"""
+import os
 import logging
 import sys
 import subprocess as sp
@@ -11,10 +12,19 @@ __author__ = "Per Unneberg"
 
 logger = logging.getLogger(__name__)
 
+SNAKEFILE = os.path.join(os.path.abspath(os.path.dirname(__file__)), "workflow", "Snakefile")
+__RUNDOC__ = (
+"Run datasources snakemake workflow"
+" "
+"Given a datasources configuration file, generate data files sources."
+)
+
 
 def run(args):
-    print(f"snakemake {' '.join(args.extra_options)}")
-
+    datasources = ""
+    if args.configfile is not None:
+        datasources = f"--config datasources={args.configfile}"
+    out = sp.check_output(f"snakemake -s {SNAKEFILE} {' '.join(args.extra_options)} {datasources}", shell=True)
 
 
 def main(arg_list=None):
@@ -34,9 +44,12 @@ def main(arg_list=None):
 
     parser = subparsers.add_parser(
         "run",
-        help=(
-            "Run snakemake workflow"
-        ),
+        help="Run datasources snakemake workflow",
+        description=__RUNDOC__,
+    )
+    parser.add_argument(
+        "--configfile", action="store", default=None,
+        help="datasources configuration file"
     )
     parser.set_defaults(runner=run)
 
