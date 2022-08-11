@@ -19,12 +19,14 @@ except ModuleNotFoundError:
     print("  3. run 'pip install datasources")
     raise
 
+
 # this container defines the underlying OS for each job when using the workflow
 # with --use-conda --use-singularity
 container: "docker://continuumio/miniconda3"
 
 
 # ##### load datasources #####
+
 
 def _read(infile, index, schema, idcols=None):
     if infile is None:
