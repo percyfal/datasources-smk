@@ -26,10 +26,13 @@ def run(args):
     datasources = ""
     if args.configfile is not None:
         datasources = f"--config datasources={args.configfile}"
-    sp.check_output(
-        f"snakemake -s {SNAKEFILE} {' '.join(args.extra_options)} {datasources}",
-        shell=True,
-    )
+    cmd = f"snakemake -s {SNAKEFILE} {' '.join(args.extra_options)} {datasources}"
+    logger.info(f"running command '{cmd}'")
+    try:
+        sp.run(cmd, check=True, shell=True)
+    except sp.CalledProcessError:
+        logger.error(f"{cmd} failed")
+        raise
 
 
 def main(arg_list=None):

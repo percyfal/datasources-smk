@@ -15,8 +15,10 @@ except ModuleNotFoundError:
     print("datasources module not installed")
     print("Either: ")
     print("  1. point PYTHONPATH to workflow source directory or")
-    print("  2. run 'pip install -e /path/to/datasources' or")
-    print("  3. run 'pip install datasources")
+    print("  2. run 'python -m pip install -e /path/to/datasources' or")
+    print(
+        "  3. run 'python -m pip install git+https://github.com/percyfal/datasources-smk@main'"
+    )
     raise
 
 
