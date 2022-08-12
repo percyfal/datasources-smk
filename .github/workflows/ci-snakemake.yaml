@@ -1,0 +1,30 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+
+  Linting:
+    steps:
+    - uses: actions/checkout@v2
+    - name: Lint workflow
+      uses: snakemake/snakemake-github-action@v1
+      with:
+        directory: src/datasources
+        snakefile: src/datasources/workflow/Snakefile
+        args: "--lint"
+        stagein: >-
+          python -m pip install --no-deps .
+
+  Testing:
+    needs: Linting
+    steps:
+    - uses: actions/checkout@v2
+    - name: Test workflow (local test data)
+      uses: snakemake/snakemake-github-action@v1
+      with:
+        directory: src/datasources/.test
+        snakefile: src/datasources/workflow/Snakefile
+        args: "--use-conda --show-failed-logs -j 2 --conda-cleanup-pkgs cache"
+        stagein: >-
+          python -m pip install --no-deps .
