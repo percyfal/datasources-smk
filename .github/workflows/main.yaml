@@ -24,6 +24,6 @@ jobs:
     - name: Install repo
       run: python -m pip install --no-deps .
     - name: Install snakemake
-      run: python -m pip install snakemake
+      run: mamba install snakemake numpy
     - name: Test workflow with datasources cli (local test data)
       run: datasources run --directory src/datasources/.test --show-failed-logs -j 2 --conda-cleanup-pkgs cache
