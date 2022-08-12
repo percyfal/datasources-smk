@@ -3,7 +3,8 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
-  test:
+
+  Test-cli:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     strategy:
@@ -12,8 +13,6 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}  # a login shell is required for conda activation
-
-  Test-cli:
     steps:
     - uses: actions/checkout@v2
     - name: Create conda environment
