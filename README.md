@@ -13,7 +13,7 @@ sources can be local or remote files.
 Easiest is to install via pip:
 
 	python -m pip install git+https://github.com/percyfal/datasources-smk@main
-	
+
 Alternatively grab a copy of the source distribution and make a local
 install:
 
@@ -21,7 +21,7 @@ install:
 	cd datasources-smk
 	python -m pip install -e .
 
-## Usage 
+## Usage
 
 The workflow and additional commands run via the main entry point:
 
@@ -39,7 +39,7 @@ consisting of `data` and `source` keys, or alternatively a
 tab-separated file with columns `data` and `source`. The `data` and
 `source` keys define file URI mapping from source to a snakemake
 target. Supported URI schemes are currently `rsync`, `file`, `sftp`,
-`http` and `https`. 
+`http` and `https`.
 
 There are two optional keys; `description` is a free text field for
 provenance information, and `tag` a tag to group data types such that
@@ -81,7 +81,7 @@ and the corresponding yaml file
 	  description: Grab readme file from github
 	- data: data/foo/foo*txt
 	  source: file:external_resources/
-	  description: >- 
+	  description: >-
 	    link all *txt files from directory external_resources to directory
 		data/foo
 
