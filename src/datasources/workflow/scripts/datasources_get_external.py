@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 __author__ = "Per Unneberg"
 __copyright__ = "Copyright 2020, Per Unneberg"
 __email__ = "per.unneberg@scilifelab.se"
 __license__ = "MIT"
 
 import os
-import re
 from snakemake.shell import shell
 from snakemake.utils import logger
 
@@ -18,8 +16,14 @@ if source is None or len(source) == 0:
 target = snakemake.output.target
 scheme = snakemake.params.scheme
 
-cmd_map = {"": "ln -s", "rsync": "rsync -av", "sftp": "cp", "file":
-           "ln -s", "http": "wget", "https": "wget"}
+cmd_map = {
+    "": "ln -s",
+    "rsync": "rsync -av",
+    "sftp": "cp",
+    "file": "ln -s",
+    "http": "wget",
+    "https": "wget",
+}
 cmd = cmd_map[scheme]
 
 if not isinstance(source, list):
@@ -30,6 +34,9 @@ if len(source) != len(target):
     print("source and target must be of equal lengths")
     raise Exception
 
+
+# FIXME: Move to datasources function. Add pattern/tag argument for
+# restricting outputs
 for src, tgt in zip(source, target):
     outdir = os.path.dirname(tgt)
     shell("mkdir -p {outdir}")

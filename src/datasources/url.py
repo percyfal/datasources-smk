@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 __author__ = "Per Unneberg"
 __copyright__ = "Copyright 2021, Per Unneberg"
 __email__ = "per.unneberg@scilifelab.se"
@@ -16,7 +15,7 @@ from urllib import parse
 def urlparse(url, scheme=None):
     if url is None:
         return None
-    if not scheme is None:
+    if scheme is not None:
         if isinstance(url, str):
             url = f"{scheme}:{url}"
         elif isinstance(url, list):
@@ -33,51 +32,48 @@ class Url(parse.ParseResult):
     def __init__(self, *args, **kwargs):
         super().__init__()
 
-
     def _uri(self, scheme=False):
         if scheme:
             scheme = self.scheme
         else:
-            scheme = ''
-        uri = parse.urlunsplit((scheme, self.netloc, self.path, '', ''))
+            scheme = ""
+        uri = parse.urlunsplit((scheme, self.netloc, self.path, "", ""))
         uri = re.sub("^//", "", uri)
         return uri
-
 
     @property
     def uri(self):
         """Format url as uri without scheme"""
         return self._uri()
 
-
     @property
     def full_uri(self):
         """Format url as uri with scheme"""
         return self._uri(scheme=True)
 
-
     @property
     def source(self):
         """Create snakemake target representation of data source"""
         uri = self.uri
-        if self.scheme == 'sftp':
+        if self.scheme == "sftp":
             # FIXME: this setup currently fails; in contrast to fabric
             # it seems paramiko doesn't make use of the ssh-agent
             try:
                 from snakemake.remote.SFTP import RemoteProvider
+
                 SFTP = RemoteProvider()
                 uri = SFTP.remote(self.uri)
             except WorkflowError as e:
                 logger.error(e)
-        elif self.scheme == 'http' or self.scheme == 'https':
+        elif self.scheme == "http" or self.scheme == "https":
             try:
                 from snakemake.remote.HTTP import RemoteProvider
+
                 HTTP = RemoteProvider()
                 uri = HTTP.remote(self.uri)
             except WorkflowError as e:
                 logger.error(e)
         return uri
-
 
     @property
     def wildcard(self):
@@ -85,9 +81,8 @@ class Url(parse.ParseResult):
             return None
         return self.basename
 
-
     def glob(self):
-        if self.netloc == '':
+        if self.netloc == "":
             return urlparse(glob.glob(self.uri), scheme=self.scheme)
         try:
             import fabric
@@ -103,30 +98,30 @@ class Url(parse.ParseResult):
         data = fnmatch.filter(c.sftp().listdir(dirname(self.path)), self.wildcard)
         ret = []
         for d in data:
-            ret.append(parse.urlunsplit((self.scheme, self.netloc, pjoin(dirname(self.path), d), None, None)))
+            ret.append(
+                parse.urlunsplit(
+                    (self.scheme, self.netloc, pjoin(dirname(self.path), d), None, None)
+                )
+            )
         return urlparse(ret)
-
 
     @property
     def basename(self):
         return basename(self.path)
 
-
     @property
     def dirname(self):
         return dirname(self.uri)
-
 
     def __str__(self):
         return self.uri
 
 
-
-
 class UrlMap:
     def __init__(self, source, target):
-        assert isinstance(source, list) and isinstance(target, list), \
-            print("source and target must be list of strings")
+        assert isinstance(source, list) and isinstance(target, list), print(
+            "source and target must be list of strings"
+        )
         self._source = list()
         self._target = list()
         for (src, tgt) in zip(source, target):
@@ -136,7 +131,9 @@ class UrlMap:
                 src = urlparse(pjoin(src, tgt.wildcard))
                 globsrc = src.glob()
                 self._source.extend(globsrc)
-                self._target.extend(urlparse([pjoin(tgt.dirname, fn.basename) for fn in globsrc]))
+                self._target.extend(
+                    urlparse([pjoin(tgt.dirname, fn.basename) for fn in globsrc])
+                )
             else:
                 self._target.append(urlparse(tgt))
                 self._source.append(urlparse(src))
@@ -145,43 +142,33 @@ class UrlMap:
     def source(self):
         return self._source
 
-
     @property
     def target(self):
         return self._target
-
 
     @property
     def uri_keys(self):
         return [x.uri for x in self.target]
 
-
     @property
     def uri_dict(self):
         return dict(zip(self.uri_keys, self.source))
 
-
     def get_source_url(self, wildcards):
         return self.uri_dict[wildcards.target]
-
 
     def get_source(self, wildcards):
         return self.get_source_url(wildcards).source
 
-
     def get_source_uri(self, wildcards):
         return self.get_source_url(wildcards).uri
 
-
     def get_source_scheme(self, wildcards):
         return self.get_source_url(wildcards).scheme
-
 
     @property
     def pairs(self):
         return zip(self.source, self.target)
 
-
     def __iter__(self):
-        for (source, target) in self.pairs:
-            yield source, target
+        yield from self.pairs

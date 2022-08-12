@@ -3,4 +3,5 @@ include: "rules/utils.smk"
 
 
 rule all:
-    input: all_input
+    input:
+        all_input,

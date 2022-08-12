@@ -7,25 +7,28 @@ import numpy as np
 import glob
 from snakemake.utils import validate
 import pandas as pd
-from url import UrlMap
 
-# Determine wrapper prefix since we mix local wrappers with wrappers
-# from snakemake-wrappers
-SMK_WRAPPER_PREFIX_RAW = "https://github.com/snakemake/snakemake-wrappers/raw"
-WRAPPER_PREFIX = workflow.wrapper_prefix
-if WRAPPER_PREFIX == SMK_WRAPPER_PREFIX_RAW:
-    # Change main to version number once we start sem-versioning
-    WRAPPER_PREFIX = "https://raw.githubusercontent.com/percyfal/datasources-smk/main/workflow/wrappers"
+try:
+    from datasources.url import UrlMap
+    from datasources.utils import wildcards_or
+except ModuleNotFoundError:
+    print("datasources module not installed")
+    print("Either: ")
+    print("  1. point PYTHONPATH to workflow source directory or")
+    print("  2. run 'python -m pip install -e /path/to/datasources' or")
+    print(
+        "  3. run 'python -m pip install git+https://github.com/percyfal/datasources-smk@main'"
+    )
+    raise
 
 
 # this container defines the underlying OS for each job when using the workflow
 # with --use-conda --use-singularity
 container: "docker://continuumio/miniconda3"
 
-##### load config and sample sheets #####
 
-configfile: "config/config.yaml"
-validate(config, schema="../schemas/config.schema.yaml")
+# ##### load datasources #####
+
 
 def _read(infile, index, schema, idcols=None):
     if infile is None:
@@ -33,7 +36,7 @@ def _read(infile, index, schema, idcols=None):
     if os.path.splitext(infile)[1] == ".yaml":
         with open(infile) as fh:
             data = yaml.load(fh, yaml.Loader)
-        assert(isinstance(data, list))
+        assert isinstance(data, list)
         df = pd.DataFrame(data)
     elif os.path.splitext(infile)[1] == ".tsv":
         df = pd.read_csv(infile, sep="\t")
@@ -43,23 +46,28 @@ def _read(infile, index, schema, idcols=None):
     validate(df, schema=schema)
     return df
 
+
+if config.get("datasources") is None:
+    configfiles = [
+        "datasources.yaml",
+        "datasources.tsv",
+        "config/datasources.yaml",
+        "config/datasources.tsv",
+    ]
+else:
+    configfiles = [config.get("datasources")]
+
 datasources = None
-for infile in config.get("datasources", None), "config/datasources.yaml", "config/datasources.tsv":
+
+for infile in configfiles:
     if infile is not None and os.path.exists(infile):
-        datasources = _read(infile, ["data"],
-                            "../schemas/datasources.schema.yaml")
+        datasources = _read(infile, ["data"], "../schemas/datasources.schema.yaml")
     if datasources is not None:
         break
 if datasources is None:
     print("No datasources found: exiting")
     sys.exit(1)
 
-##################################################
-## Formatting functions and other utilities
-##################################################
-def wildcards_or(items):
-    items = [str(x) for x in set(items)]
-    return f'({"|".join(items)})'
 
 ##################################################
 # Input collection functions
