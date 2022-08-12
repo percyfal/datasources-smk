@@ -27,6 +27,8 @@ jobs:
         directory: src/datasources/.test
         snakefile: src/datasources/workflow/Snakefile
         args: "--use-conda --show-failed-logs -j 2 --conda-cleanup-pkgs cache"
+        stagein: >-
+          python -m pip install --no-deps .
 
   Test-cli:
     runs-on: ubuntu-latest
