@@ -45,6 +45,7 @@ There are two optional keys; `description` is a free text field for
 provenance information, and `tag` a tag to group data types such that
 subsets of datasources can be targeted.
 
+
 The datasources file can be provided via the `--configfile` option. If
 unset, the workflow will look for files `datasources.yaml`,
 `datasources.tsv`, `config/datasources.yaml` and
@@ -56,6 +57,33 @@ For instance, a local file is given as `file:relative/path/to/source`,
 whereas examples of a remote files are
 `rsync://example.com:80/absolute/path/to/source` and
 `sftp://example.com:80/absolute/path/to/source`.
+
+## Example datasources files
+
+A tsv-formatted datasources file can look like
+
+	data	source
+	data/foo1.txt	rsync:external_resources/foo1.txt
+	data/foo2.txt	file:external_resources/foo2.txt
+	data/README.md	https://raw.githubusercontent.com/percyfal/datasources-smk/main/README.md
+	data/foo/foo*txt	file:external_resources/
+
+and the corresponding yaml file
+
+	- data: data/foo1.txt
+	  source: rsync:external_resources/foo1.txt
+	  description: foo1 data file to copy
+	- data: data/foo2.txt
+	  source: file:external_resources/foo2.txt
+	  description: foo2 data file to link
+	- data: data/README.md
+	  source: https://raw.githubusercontent.com/percyfal/datasources-smk/main/README.md
+	  description: Grab readme file from github
+	- data: data/foo/foo*txt
+	  source: file:external_resources/
+	  description: >- 
+	    link all *txt files from directory external_resources to directory
+		data/foo
 
 
 ## Authors
